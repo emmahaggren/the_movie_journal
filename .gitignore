@@ -1,2 +1,52 @@
-#Environments
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
 .env
+.venv/
+venv/
+env/
+ENV/
+*.sqlite3
+*.db
+movies.db
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+
+# Test and coverage files
+.coverage
+*.cover
+coverage.xml
+htmlcov/
+
+# Logs
+*.log
+*.out
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# === React (Node) ===
+node_modules/
+build/
+dist/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === macOS / Linux / Windows system files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === VS Code ===
+.vscode/
+
+# === Git ===
+.git/
