@@ -16,7 +16,7 @@ def init_db():
             movie_title TEXT,
             movie_poster TEXT,
             movie_genre TEXT,
-            movie_date INTEGER,
+            movie_year INTEGER,
             movie_rating INTEGER,
             movie_comment TEXT
         )

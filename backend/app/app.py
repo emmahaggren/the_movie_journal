@@ -39,14 +39,14 @@ def add_movie():
     cursor = db.cursor()
     cursor.execute('''
         INSERT INTO movies (
-            movie_id, movie_title, movie_poster, movie_genre, movie_date, movie_rating, movie_comment
+            movie_id, movie_title, movie_poster, movie_genre, movie_year, movie_rating, movie_comment
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('id'),
         data.get('title'),
         data.get('poster'),
         data.get('genre'),
-        data.get('date'),
+        data.get('year'),
         data.get('rating'),
         data.get('comment')
     ))
