@@ -7,32 +7,48 @@ cursor = db.cursor()
 
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS movies (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        rating INTEGER,
-        comment TEXT
+        movie_id TEXT PRIMARY KEY,
+        movie_title TEXT,
+        movie_poster TEXT,
+        movie_genre TEXT,
+        movie_date INTEGER,
+        movie_rating INTEGER,
+        movie_comment TEXT
     )
 ''')
 db.commit()
 db.close()
 
 @get('/movies')
-def get_movies():
-    db = sqlite3.connect('movies.db')
+def get_all_movies():
     cursor.execute('SELECT * FROM movies')
     movies = cursor.fetchall()
     db.close()
     return {'movies': movies}
 
+@get('/movies')
+def get_movie_by_id():
+    movie_id = request.query.id
+    cursor.execute('SELECT * FROM movies WHERE movie_id = ?', (movie_id,))
+    movie = cursor.fetchone()
+    db.close()
+    if movie:
+        return {'movie': movie}
+    else:
+        response.status = 404
+        return {'error': 'Movie not found'}
+
 @post('/movies')
 def add_movie():
     data = request.json
+    id = data.get('id')
     title = data.get('title')
+    poster = data.get('poster')
+    genre = data.get('genre')
+    date = data.get('date')
     rating = data.get('rating')
     comment = data.get('comment')
-
-    db = sqlite3.connect('movies.db')
-    cursor.execute('INSERT INTO movies (title, rating, comment) VALUES (?, ?, ?)', (title, rating, comment))
+    cursor.execute('INSERT INTO movies (id, title, poster, genre, date, rating, comment) VALUES (?, ?, ?, ?, ?, ?, ?)', (id, title, poster, genre, date, rating, comment))
     db.commit()
     db.close()
     response.status = 201
