@@ -10,6 +10,7 @@ def get_db():
 def init_db():
     db = get_db()
     cursor = db.cursor()
+    cursor.execute('DROP TABLE IF EXISTS movies')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS movies (
             movie_id TEXT PRIMARY KEY,

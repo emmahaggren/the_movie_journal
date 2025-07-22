@@ -7,7 +7,14 @@ from dotenv import load_dotenv
 app = Bottle()
 init_db()
 
-#Get all movies from the database
+# Enable CORS for all routes
+@app.hook('after_request')
+def enable_cors():
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept'
+
+# Get all movies from the database
 @app.get('/movies')
 def get_all_movies():
     db = get_db()
@@ -35,8 +42,19 @@ def get_movie_by_id(movie_id):
 @app.post('/movies')
 def add_movie():
     data = request.json
+    print("Received data:", data)
     db = get_db()
     cursor = db.cursor()
+
+    year = data.get('year')
+    if year:
+        try:
+            year = int(year)
+        except (ValueError, TypeError):
+            year = None
+    else:
+        year = None
+
     cursor.execute('''
         INSERT INTO movies (
             movie_id, movie_title, movie_poster, movie_genre, movie_year, movie_rating, movie_comment
@@ -46,7 +64,7 @@ def add_movie():
         data.get('title'),
         data.get('poster'),
         data.get('genre'),
-        data.get('year'),
+        year,
         data.get('rating'),
         data.get('comment')
     ))
@@ -61,25 +79,31 @@ load_dotenv()
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 print(f"OMDb API Key: {OMDB_API_KEY}")
 
-# Search for a movie using the OMDb API
+# Search for a movie using the OMDb API, optionally by year
 @app.get('/omdb/search')
 def search_movie():
     title = request.query.title
+    year = request.query.year  # Optional year parameter
+
     if not title:
         return {'error': 'Missing title parameter'}
 
-    response = requests.get(
+    params = {
+        'apikey': OMDB_API_KEY,
+        't': title
+    }
+    if year:
+        params['y'] = year
+
+    omdb_response = requests.get(
         'http://www.omdbapi.com/',
-        params={
-            'apikey': OMDB_API_KEY,
-            't': title
-        }
+        params=params
     )
 
-    if response.status_code != 200:
+    if omdb_response.status_code != 200:
         return {'error': 'OMDb request failed'}
 
-    data = response.json()
+    data = omdb_response.json()
     if data.get('Response') == 'False':
         return {'error': data.get('Error', 'Movie not found')}
 
@@ -92,7 +116,7 @@ def search_movie():
         'imdbID': data.get('imdbID')
     }
 
-# Initialize the database
+# Initialize the database and start the server
 if __name__ == '__main__':
     print("Server is starting at http://localhost:8080 ...")
     run(app, host='localhost', port=8080, debug=True)
